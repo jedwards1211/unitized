@@ -2,7 +2,7 @@ package org.andork.unit;
 
 import java.text.NumberFormat;
 
-public abstract class UnitizedNumber<T extends UnitType<T>> {
+public abstract class UnitizedNumber<T extends UnitType<T>> implements Comparable<UnitizedNumber<T>> {
 	public final Unit<T> unit;
 
 	protected UnitizedNumber(Unit<T> unit) {
@@ -19,6 +19,10 @@ public abstract class UnitizedNumber<T extends UnitType<T>> {
 
 	public abstract UnitizedNumber<T> mul(Number multiplicand);
 
+	public abstract Number div(UnitizedNumber<T> denominator);
+
+	public abstract UnitizedNumber<T> div(Number denominator);
+
 	public abstract UnitizedNumber<T> negate();
 
 	public abstract UnitizedNumber<T> in(Unit<T> unit);
@@ -32,6 +36,8 @@ public abstract class UnitizedNumber<T extends UnitType<T>> {
 	public abstract boolean isPositive();
 
 	public abstract boolean isZero();
+
+	public abstract boolean isNonzero();
 
 	public abstract UnitizedNumber<T> mod(UnitizedNumber<T> modulus);
 
@@ -60,5 +66,9 @@ public abstract class UnitizedNumber<T extends UnitType<T>> {
 
 	public String toString(NumberFormat format) {
 		return unit.toString(this, format);
+	}
+
+	public static boolean isFinite(UnitizedNumber<?> number) {
+		return number != null && number.isFinite();
 	}
 }

@@ -1,20 +1,11 @@
 package org.andork.unit;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.DoubleUnaryOperator;
+import java.math.BigDecimal;
 
 public class Angle extends UnitType<Angle> {
 	public static class AngleUnit extends Unit<Angle> {
-		private final DoubleUnaryOperator toRadians;
-
-		private final DoubleUnaryOperator fromRadians;
-
-		public AngleUnit(Angle type, String id, DoubleUnaryOperator toRadians, DoubleUnaryOperator fromRadians,
-				double range) {
-			super(type, id);
-			this.toRadians = toRadians;
-			this.fromRadians = fromRadians;
+		public AngleUnit(Angle type, String id, BigDecimal fromBaseFactor, BigDecimal toBaseFactor, double range) {
+			super(type, id, fromBaseFactor, toBaseFactor);
 			this.range = new UnitizedDouble<>(range, this);
 		}
 
@@ -29,50 +20,41 @@ public class Angle extends UnitType<Angle> {
 
 	public static final AngleUnit milsNATO;
 
-	private static final Map<Unit<Angle>, Map<Unit<Angle>, Double>> doubleConversions = new HashMap<>();
-
 	static {
 		type = new Angle();
+		type.addUnit(radians = new AngleUnit(type, "rad", BigDecimal.ONE, BigDecimal.ONE, Math.PI * 2.0));
 		type.addUnit(degrees = new AngleUnit(type, "deg",
-				angle -> Math.PI * angle / 180.0,
-				angle -> angle * 180.0 / Math.PI, 360.0));
-		type.addUnit(radians = new AngleUnit(type, "rad",
-				DoubleUnaryOperator.identity(),
-				DoubleUnaryOperator.identity(), Math.PI * 2.0));
+				new BigDecimal(180).divide(new BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148"), 64, BigDecimal.ROUND_HALF_EVEN),
+				new BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148").divide(new BigDecimal(180), 64, BigDecimal.ROUND_HALF_EVEN),
+				360.0));
 		type.addUnit(gradians = new AngleUnit(type, "grad",
-				angle -> Math.PI * angle / 200.0,
-				angle -> angle * 200.0 / Math.PI, 4000));
-		type.addUnit(percentGrade = new AngleUnit(type, "% grade",
-				angle -> Math.atan(angle / 100.0),
-				angle -> Math.tan(angle) * 100, Double.POSITIVE_INFINITY));
+				new BigDecimal(200).divide(new BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148"), 64, BigDecimal.ROUND_HALF_EVEN),
+				new BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148").divide(new BigDecimal(200), 64, BigDecimal.ROUND_HALF_EVEN),
+				400.0));
 		type.addUnit(milsNATO = new AngleUnit(type, "mil",
-				angle -> Math.PI * angle / 3200.0,
-				angle -> 3200.0 * angle / Math.PI, 6400));
-
-		Map<Unit<Angle>, Double> degreeConversions = new HashMap<>();
-		degreeConversions.put(radians, Math.PI / 180.0);
-		degreeConversions.put(gradians, 400.0 / 360.0);
-		doubleConversions.put(degrees, degreeConversions);
-
-		Map<Unit<Angle>, Double> radianConversions = new HashMap<>();
-		radianConversions.put(degrees, 180.0 / Math.PI);
-		radianConversions.put(gradians, 200.0 / Math.PI);
-		doubleConversions.put(radians, radianConversions);
-
-		Map<Unit<Angle>, Double> gradianConversions = new HashMap<>();
-		gradianConversions.put(degrees, 360.0 / 400.0);
-		gradianConversions.put(radians, Math.PI / 200.0);
-		doubleConversions.put(gradians, gradianConversions);
-
-		/**
-		 * Add identity conversions
-		 */
-		for (Unit<Angle> unit : type.units()) {
-			Map<Unit<Angle>, Double> conv = doubleConversions.get(unit);
-			if (conv != null) {
-				conv.put(unit, 1.0);
+				new BigDecimal(3200).divide(new BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148"), 64, BigDecimal.ROUND_HALF_EVEN),
+				new BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148").divide(new BigDecimal(3200), 64, BigDecimal.ROUND_HALF_EVEN),
+				6400));
+		
+		type.addUnit(percentGrade = new AngleUnit(type, "% grade", null, null, Double.POSITIVE_INFINITY) {
+			@Override
+			public BigDecimal fromBaseFactor() {
+				throw new UnsupportedOperationException("percent grade is not a linear unit");
 			}
-		}
+
+			@Override
+			public BigDecimal toBaseFactor() {
+				throw new UnsupportedOperationException("percent grade is not a linear unit");
+			}
+			
+			public BigDecimal fromBase(BigDecimal angle) {
+				return new BigDecimal(Math.tan(angle.doubleValue())).scaleByPowerOfTen(2);
+			}
+			
+			public BigDecimal toBase(BigDecimal angle) {
+				return new BigDecimal(Math.atan(angle.scaleByPowerOfTen(-2).doubleValue()));
+			}
+		});
 	}
 
 	public static void main(String[] args) {
@@ -88,14 +70,7 @@ public class Angle extends UnitType<Angle> {
 
 	@Override
 	public double convert(double d, Unit<Angle> from, Unit<Angle> to) {
-		Map<Unit<Angle>, Double> subMap = doubleConversions.get(from);
-		if (subMap != null) {
-			Double ratio = subMap.get(to);
-			if (ratio != null) {
-				return d * ratio;
-			}
-		}
-		return ((AngleUnit) to).fromRadians.applyAsDouble(((AngleUnit) from).toRadians.applyAsDouble(d));
+		return to.fromBase(from.toBase(new BigDecimal(d))).doubleValue();
 	}
 
 	public static double sin(UnitizedNumber<Angle> angle) {
@@ -110,9 +85,25 @@ public class Angle extends UnitType<Angle> {
 		return Math.tan(angle.doubleValue(radians));
 	}
 
+	public static UnitizedDouble<Angle> asin(double value) {
+		return new UnitizedDouble<>(Math.asin(value), Angle.radians);
+	}
+
+	public static UnitizedDouble<Angle> acos(double value) {
+		return new UnitizedDouble<>(Math.acos(value), Angle.radians);
+	}
+
+	public static UnitizedDouble<Angle> atan(double value) {
+		return new UnitizedDouble<>(Math.atan(value), Angle.radians);
+	}
+
 	public static UnitizedDouble<Angle> atan2(UnitizedNumber<Length> y, UnitizedNumber<Length> x) {
 		return new UnitizedDouble<>(
 				Math.atan2(y.doubleValue(y.unit), x.doubleValue(y.unit)), Angle.radians);
+	}
+
+	public static UnitizedDouble<Angle> atan2(double y, double x) {
+		return new UnitizedDouble<>(Math.atan2(y, x), Angle.radians);
 	}
 
 	public static UnitizedDouble<Angle> normalize(UnitizedDouble<Angle> a) {

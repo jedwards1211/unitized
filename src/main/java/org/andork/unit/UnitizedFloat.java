@@ -118,6 +118,11 @@ public class UnitizedFloat<T extends UnitType<T>> extends UnitizedNumber<T> {
 	}
 
 	@Override
+	public boolean isNonzero() {
+		return value != 0;
+	}
+
+	@Override
 	public UnitizedFloat<T> mod(UnitizedNumber<T> modulus) {
 		float newValue = value % modulus.floatValue(unit);
 		return newValue == value ? this : new UnitizedFloat<>(newValue, unit);
@@ -126,5 +131,20 @@ public class UnitizedFloat<T extends UnitType<T>> extends UnitizedNumber<T> {
 	@Override
 	public UnitizedFloat<T> abs() {
 		return value < 0 ? negate() : this;
+	}
+
+	@Override
+	public Float div(UnitizedNumber<T> denominator) {
+		return value / denominator.floatValue(unit);
+	}
+
+	@Override
+	public UnitizedNumber<T> div(Number denominator) {
+		return new UnitizedFloat<>(value / denominator.floatValue(), unit);
+	}
+
+	@Override
+	public int compareTo(UnitizedNumber<T> other) {
+		return Float.compare(value, other.floatValue(unit));
 	}
 }

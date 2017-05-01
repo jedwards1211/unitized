@@ -1,5 +1,8 @@
 package org.andork.unit;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
 public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 	private final double value;
 
@@ -43,7 +46,7 @@ public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 
 	@Override
 	public double doubleValue(Unit<T> unit) {
-		if (unit == this.unit) {
+		if (unit.equals(this.unit)) {
 			return value;
 		}
 		return this.unit.type.convert(value, this.unit, unit);
@@ -53,7 +56,7 @@ public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 	public boolean equals(Object o) {
 		if (o instanceof UnitizedDouble) {
 			UnitizedDouble<?> u = (UnitizedDouble<?>) o;
-			return value == u.value && unit == u.unit;
+			return value == u.value && unit.equals(u.unit);
 		}
 		return false;
 	}
@@ -65,7 +68,7 @@ public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 
 	@Override
 	public UnitizedDouble<T> in(Unit<T> unit) {
-		if (unit == this.unit) {
+		if (unit.equals(this.unit)) {
 			return this;
 		}
 		return new UnitizedDouble<>(doubleValue(unit), unit);
@@ -93,6 +96,18 @@ public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 	public UnitizedDouble<T> mul(Number multiplicand) {
 		return new UnitizedDouble<>(value * multiplicand.doubleValue(), unit);
 	}
+	
+	public UnitizedDouble<?> mul(UnitizedDouble<?> other) {
+		UnitType<?> unitType = unit.type.mul(other.unit.type);
+		double value;
+		if (unitType instanceof CompositeUnitType) {
+			CompositeUnitType composite = (CompositeUnitType) unitType;
+			value = new BigDecimal(this.value).multiply(
+					new BigDecimal(other.value).multiply(composite.getPartialConversionFactor(other.unit, unit))).doubleValue();
+		} else {
+			value = this.value * other.value;
+		}
+	}
 
 	@Override
 	public boolean isNegative() {
@@ -110,6 +125,11 @@ public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 	}
 
 	@Override
+	public boolean isNonzero() {
+		return value != 0;
+	}
+
+	@Override
 	public UnitizedDouble<T> mod(UnitizedNumber<T> modulus) {
 		double newValue = value % modulus.doubleValue(unit);
 		return newValue == value ? this : new UnitizedDouble<>(newValue, unit);
@@ -118,5 +138,20 @@ public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 	@Override
 	public UnitizedDouble<T> abs() {
 		return value < 0 ? negate() : this;
+	}
+
+	@Override
+	public Double div(UnitizedNumber<T> denominator) {
+		return value / denominator.doubleValue(unit);
+	}
+
+	@Override
+	public UnitizedNumber<T> div(Number denominator) {
+		return new UnitizedDouble<>(value / denominator.doubleValue(), unit);
+	}
+
+	@Override
+	public int compareTo(UnitizedNumber<T> other) {
+		return Double.compare(value, other.doubleValue(unit));
 	}
 }
