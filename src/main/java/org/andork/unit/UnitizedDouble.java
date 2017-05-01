@@ -1,8 +1,5 @@
 package org.andork.unit;
 
-import java.math.BigDecimal;
-import java.util.Map;
-
 public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 	private final double value;
 
@@ -95,18 +92,6 @@ public class UnitizedDouble<T extends UnitType<T>> extends UnitizedNumber<T> {
 	@Override
 	public UnitizedDouble<T> mul(Number multiplicand) {
 		return new UnitizedDouble<>(value * multiplicand.doubleValue(), unit);
-	}
-	
-	public UnitizedDouble<?> mul(UnitizedDouble<?> other) {
-		UnitType<?> unitType = unit.type.mul(other.unit.type);
-		double value;
-		if (unitType instanceof CompositeUnitType) {
-			CompositeUnitType composite = (CompositeUnitType) unitType;
-			value = new BigDecimal(this.value).multiply(
-					new BigDecimal(other.value).multiply(composite.getPartialConversionFactor(other.unit, unit))).doubleValue();
-		} else {
-			value = this.value * other.value;
-		}
 	}
 
 	@Override

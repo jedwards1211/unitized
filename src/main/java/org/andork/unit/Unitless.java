@@ -10,4 +10,8 @@ public class Unitless extends UnitType<Unitless> {
 		if (to != unit) throw new IllegalArgumentException("to is not unitless");
 		return d;
 	}
+	
+	public static <T extends UnitType<T>> UnitizedDouble<Unitless> divide(UnitizedDouble<T> a, UnitizedDouble<T> b) {
+		return new UnitizedDouble<>(a.doubleValue(a.unit) / b.doubleValue(a.unit), unit);
+	}
 }

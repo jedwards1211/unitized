@@ -1,9 +1,7 @@
 package org.andork.unit;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class Length extends UnitType<Length> {
@@ -52,9 +50,32 @@ public class Length extends UnitType<Length> {
 	private Length() {
 
 	}
+	
+	public static UnitizedDouble<Length> kilometers(double value) {
+		return new UnitizedDouble<>(value, kilometers);
+	}
+	
+	public static UnitizedDouble<Length> meters(double value) {
+		return new UnitizedDouble<>(value, meters);
+	}
+	
+	public static UnitizedDouble<Length> centimeters(double value) {
+		return new UnitizedDouble<>(value, centimeters);
+	}
+	
+	public static UnitizedDouble<Length> miles(double value) {
+		return new UnitizedDouble<>(value, miles);
+	}
 
-	@Override
-	public double convert(double d, Unit<Length> from, Unit<Length> to) {
-		return from.toBaseFactor().multiply(to.fromBaseFactor()).multiply(new BigDecimal(d)).doubleValue();
+	public static UnitizedDouble<Length> yards(double value) {
+		return new UnitizedDouble<>(value, yards);
+	}
+
+	public static UnitizedDouble<Length> feet(double value) {
+		return new UnitizedDouble<>(value, feet);
+	}
+
+	public static UnitizedDouble<Length> inches(double value) {
+		return new UnitizedDouble<>(value, inches);
 	}
 }
