@@ -7,28 +7,28 @@ public class AngleTests {
 	@Test
 	public void testNormalize() {
 		Assert.assertEquals(
-				new UnitizedDouble<>(300.0, Angle.degrees),
-				Angle.normalize(new UnitizedDouble<>(300.0, Angle.degrees)));
+				Angle.degrees(300),
+				Angle.normalize(Angle.degrees(300.0)));
 		Assert.assertEquals(
-				new UnitizedDouble<>(300.0, Angle.degrees),
-				Angle.normalize(new UnitizedDouble<>(-60.0, Angle.degrees)));
+				Angle.degrees(300.0),
+				Angle.normalize(Angle.degrees(-60.0)));
 		Assert.assertEquals(
-				new UnitizedDouble<>(Math.PI * 3 / 2, Angle.radians),
-				Angle.normalize(new UnitizedDouble<>(-Math.PI / 2, Angle.radians)));
+				Angle.radians(Math.PI * 3 / 2),
+				Angle.normalize(Angle.radians(-Math.PI / 2)));
 	}
 
 	public void testOpposite() {
 		Assert.assertEquals(
-				new UnitizedDouble<>(120.0, Angle.degrees),
-				Angle.opposite(new UnitizedDouble<>(300.0, Angle.degrees)));
+				Angle.degrees(120.0),
+				Angle.opposite(Angle.degrees(300.0)));
 		Assert.assertEquals(
-				new UnitizedDouble<>(300.0, Angle.degrees),
-				Angle.opposite(new UnitizedDouble<>(120.0, Angle.degrees)));
+				Angle.degrees(300.0),
+				Angle.opposite(Angle.degrees(120.0)));
 		Assert.assertEquals(
-				new UnitizedDouble<>(Math.PI * 3 / 2, Angle.radians),
-				Angle.opposite(new UnitizedDouble<>(Math.PI / 2, Angle.radians)));
+				Angle.radians(Math.PI * 3 / 2),
+				Angle.opposite(Angle.radians(Math.PI / 2)));
 		Assert.assertEquals(
-				new UnitizedDouble<>(Math.PI / 2, Angle.radians),
-				Angle.opposite(new UnitizedDouble<>(Math.PI * 3 / 2, Angle.radians)));
+				Angle.radians(Math.PI / 2),
+				Angle.opposite(Angle.radians(Math.PI * 3 / 2)));
 	}
 }

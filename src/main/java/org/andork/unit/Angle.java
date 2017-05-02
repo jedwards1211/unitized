@@ -115,4 +115,24 @@ public class Angle extends UnitType<Angle> {
 		UnitizedDouble<Angle> range = ((AngleUnit) a.unit).range;
 		return normalize(a.add(range.mul(0.5)));
 	}
+	
+	public static UnitizedDouble<Angle> degrees(double value) {
+		return new UnitizedDouble<>(value, degrees);
+	}
+	
+	public static UnitizedDouble<Angle> radians(double value) {
+		return new UnitizedDouble<>(value, radians);
+	}
+	
+	public static UnitizedDouble<Angle> gradians(double value) {
+		return new UnitizedDouble<>(value, gradians);
+	}
+	
+	public static UnitizedDouble<Angle> percentGrade(double value) {
+		return new UnitizedDouble<>(value, percentGrade);
+	}
+	
+	public static UnitizedDouble<Angle> milsNATO(double value) {
+		return new UnitizedDouble<>(value, milsNATO);
+	}
 }
