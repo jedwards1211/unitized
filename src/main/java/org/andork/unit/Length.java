@@ -1,6 +1,7 @@
 package org.andork.unit;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,8 +16,11 @@ public class Length extends UnitType<Length> {
 	public static final Unit<Length> feet;
 	public static final Unit<Length> inches;
 
-	private static final Set<Unit<Length>> imperialUnits = new HashSet<>();
-	private static final Set<Unit<Length>> metricUnits = new HashSet<>();
+	private static final Set<Unit<Length>> mutableImperialUnits = new HashSet<>();
+	private static final Set<Unit<Length>> mutableMetricUnits = new HashSet<>();
+
+	public static final Set<Unit<Length>> imperialUnits = Collections.unmodifiableSet(mutableImperialUnits);
+	public static final Set<Unit<Length>> metricUnits = Collections.unmodifiableSet(mutableMetricUnits);
 
 	static {
 		type = new Length();
@@ -37,14 +41,14 @@ public class Length extends UnitType<Length> {
 				feet.fromBaseFactor().multiply(new BigDecimal(12)),
 				feet.toBaseFactor().divide(new BigDecimal(12), 64, BigDecimal.ROUND_HALF_EVEN)));
 
-		metricUnits.add(kilometers);
-		metricUnits.add(meters);
-		metricUnits.add(centimeters);
+		mutableMetricUnits.add(kilometers);
+		mutableMetricUnits.add(meters);
+		mutableMetricUnits.add(centimeters);
 
-		imperialUnits.add(miles);
-		imperialUnits.add(yards);
-		imperialUnits.add(feet);
-		imperialUnits.add(inches);
+		mutableImperialUnits.add(miles);
+		mutableImperialUnits.add(yards);
+		mutableImperialUnits.add(feet);
+		mutableImperialUnits.add(inches);
 	}
 
 	private Length() {
