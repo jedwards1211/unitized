@@ -31,23 +31,27 @@ public class Area extends UnitType<Area> {
 	private static final Set<Unit<Area>> metricUnits = new HashSet<>();
 
 	private static final Map<Unit<Length>, AreaUnit> squares = new HashMap<>();
-
-	private static AreaUnit square(Unit<Length> unit) {
+	
+	private static AreaUnit _square(Unit<Length> unit) {
 		AreaUnit result = new AreaUnit(unit);
 		squares.put(unit, result);
 		return result;
 	}
+	
+	public static Unit<Area> square(Unit<Length> unit) {
+		return squares.get(unit);
+	}
 
 	static {
 		type = new Area();
-		type.addUnit(squareKilometers = square(Length.kilometers));
-		type.addUnit(squareMeters = square(Length.meters));
-		type.addUnit(squareCentimeters = square(Length.centimeters));
+		type.addUnit(squareKilometers = _square(Length.kilometers));
+		type.addUnit(squareMeters = _square(Length.meters));
+		type.addUnit(squareCentimeters = _square(Length.centimeters));
 
-		type.addUnit(squareMiles = square(Length.miles));
-		type.addUnit(squareYards = square(Length.yards));
-		type.addUnit(squareFeet = square(Length.feet));
-		type.addUnit(squareInches = square(Length.inches));
+		type.addUnit(squareMiles = _square(Length.miles));
+		type.addUnit(squareYards = _square(Length.yards));
+		type.addUnit(squareFeet = _square(Length.feet));
+		type.addUnit(squareInches = _square(Length.inches));
 
 		metricUnits.add(squareKilometers);
 		metricUnits.add(squareMeters);
